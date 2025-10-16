@@ -76,7 +76,7 @@ select_config() {
 	if ! [ "$#" -eq 0 ] && [[ "$1" =~ ^([0-9]{1,3})$ ]] && [[ "$1" -gt 0 ]] && [[ "$1" -le ${#contexts[@]} ]]; then
 		local option="$1"
 	else
-		echo "No args given or invalid arg. Going into interactive mode..."
+		echo "No args given. Going into interactive mode..."
 		while true; do
 			echo "Choose a context to use..."
 			i=1
