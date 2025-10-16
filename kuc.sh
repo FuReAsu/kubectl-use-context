@@ -21,19 +21,19 @@ import() {
 	local -a config_files=("$@")
 	if [ "${#config_files[@]}" -eq 0 ]; then
 		echo "Empty input. Exiting..."
-		exit 1
+	else
+		for config_file in "${config_files[@]}"; do
+			if ! [ -f "$config_file" ]; then
+				echo "$config_file doesn't exist skipping..."
+				continue
+			else
+				file_name=$(basename $config_file)
+				cp $config_file $config_dir/$file_name
+				chmod 600 $config_dir/$file_name
+				echo "copied $config_file to $config_dir/$file_name"
+			fi
+		done
 	fi
-	for config_file in "${config_files[@]}"; do
-		if ! [ -f "$config_file" ]; then
-			echo "$config_file doesn't exist skipping..."
-			continue
-		else
-			file_name=$(basename $config_file)
-			cp $config_file $config_dir/$file_name
-			chmod 600 $config_dir/$file_name
-			echo "copied $config_file to $config_dir/$file_name"
-		fi
-	done
 }
 
 current() {
