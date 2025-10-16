@@ -4,7 +4,7 @@
 declare config_dir="$HOME/.kube/config.d"
 declare current_file="$HOME/.kube/kuc_current"
 declare local_bin="$HOME/.local/bin"
-declare current_shell=$(ps -p $$ -o comm=)
+declare current_shell=${SHELL##*/}
 
 install_self() {
 	mkdir -p $local_bin
@@ -23,7 +23,7 @@ import() {
 		echo "Empty input. Exiting..."
 		exit 1
 	fi
-	for config_file in ${config_files[@]}; do
+	for config_file in "${config_files[@]}"; do
 		if ! [ -f "$config_file" ]; then
 			echo "$config_file doesn't exist skipping..."
 			continue
@@ -62,18 +62,18 @@ update_kubeconfig() {
 
 	export KUBECONFIG="${config_dir}/${context_to_use}.yaml"
 
-	sed -i '/^#kubectl context config file/d' $HOME/.bashrc
-	sed -i '/^.*KUBECONFIG.*/d' $HOME/.bashrc
+	sed -i '/^#kubectl context config file/d' $HOME/.${current_shell}rc
+	sed -i '/^.*KUBECONFIG.*/d' $HOME/.${current_shell}rc
 
 	echo "#kubectl context config file
-export KUBECONFIG=${config_dir}/${context_to_use}.yaml" >> $HOME/.bashrc
+export KUBECONFIG=${config_dir}/${context_to_use}.yaml" >> $HOME/.${current_shell}rc
 
 	echo "$config_dir/$context_to_use.yaml" > $current_file
 }
 
 select_config() {
 	local -a contexts=($(ls -tr $config_dir | sed 's/.yaml//'))
-	if ! [ "$#" -eq 0 ] && [[ "$option" =~ ^([0-9]{1,3})$ ]] && [[ "$1" -gt 0 ]] && [[ "$1" -le ${#contexts[@]} ]]; then
+	if ! [ "$#" -eq 0 ] && [[ "$1" =~ ^([0-9]{1,3})$ ]] && [[ "$1" -gt 0 ]] && [[ "$1" -le ${#contexts[@]} ]]; then
 		local option="$1"
 	else
 		echo "No args given or invalid arg. Going into interactive mode..."
