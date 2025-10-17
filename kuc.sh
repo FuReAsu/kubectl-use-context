@@ -2,7 +2,7 @@
 #kubectl use context
 
 declare config_dir="$HOME/.kube/config.d"
-declare current_file="$HOME/.kube/kuc_current"
+declare latest_file="$HOME/.kube/kuc_latest"
 declare local_bin="$HOME/.local/bin"
 declare current_shell=${SHELL##*/}
 
@@ -37,11 +37,20 @@ import() {
 }
 
 current() {
-	if ! [ -f $current_file ]; then
+	if [ -z ${KUBECONFIG+true} ]; then
+		echo "No config file is being used at the moment..."
+	else
+		local current=$KUBECONFIG
+		echo "$current"
+	fi
+}
+
+latest() {
+	if ! [ -f $latest_file ]; then
 		echo "No config is being used at the moment..."
 	else
-		local current=$(cat $current_file)
-		echo "$current"
+		local latest=$(cat $latest_file)
+		echo "$latest"
 	fi
 }
 
@@ -51,7 +60,8 @@ help() {
 	./kuc.sh --help -> show this page
 	./kuc.sh install -> copy the script to $local_bin
 	kuc import [config files] -> copy the config files to $config_dir
-	kuc current -> print the current config in use
+	kuc latest -> print the latest config in use (this will load on new session)
+	kuc current -> print the current config in use (active in current session)
 	kuc -> select configs interactively
 	kuc [number] -> select a specific config"
 }
@@ -68,7 +78,7 @@ update_kubeconfig() {
 	echo "#kubectl context config file
 export KUBECONFIG=${config_dir}/${context_to_use}.yaml" >> $HOME/.${current_shell}rc
 
-	echo "$config_dir/$context_to_use.yaml" > $current_file
+	echo "$config_dir/$context_to_use.yaml" > $latest_file
 }
 
 select_config() {
@@ -115,6 +125,9 @@ kuc_main(){
 			;;
 		"current")
 			current
+			;;
+		"latest")
+			latest
 			;;
 		"install")
 			install_self
