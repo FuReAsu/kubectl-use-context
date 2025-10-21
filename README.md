@@ -39,4 +39,6 @@ kuc --help
 |import|copy config files into the config dir at $HOME/.kube/config.d.|space separated file paths (relative or absolute)|`kuc import ./test.yaml /tmp/dev.yaml`|
 |install|copies the script to $HOME/.local/bin and add a kuc(){} line in shell rc file.|none|`./kuc.sh install`|
 |current|shows the current config file being used|none|`kuc current`|
+|latest|shows the latest config file being used|none|`kuc latest`|
 |1-999|choose which config file to use|integer (valid-range)|`kuc 3`
+|none|don't use any kubectl config (use this if you want to disable kubectl)|none|`kuc none`|

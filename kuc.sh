@@ -54,6 +54,17 @@ latest() {
 	fi
 }
 
+none() {
+	if ! [ -f $latest_file ] || [ -z ${KUBECONFIG+true} ]; then
+		echo "No config file is being used at the moment..."
+	else
+		unset KUBECONFIG
+		sed -i '/^#kubectl context config file/d' $HOME/.${current_shell}rc
+		sed -i '/^.*KUBECONFIG.*/d' $HOME/.${current_shell}rc
+		rm $latest_file
+  fi
+}
+
 help() {
 	echo "Kubectl Use Context Script"
 	echo "Usage:
@@ -63,7 +74,8 @@ help() {
 	kuc latest -> print the latest config in use (this will load on new session)
 	kuc current -> print the current config in use (active in current session)
 	kuc -> select configs interactively
-	kuc [number] -> select a specific config"
+	kuc [number] -> select a specific config
+	kuc none -> don't use any kubectl config for current next session"
 }
 
 update_kubeconfig() {
@@ -137,6 +149,9 @@ kuc_main(){
 			;;
 		[0-9]|[0-9][0-9]|[0-9][0-9][0-9]|"")
 			select_config "$option"
+			;;
+		"none")
+			none
 			;;
 		*)
 			echo "Unknown option $option..."
