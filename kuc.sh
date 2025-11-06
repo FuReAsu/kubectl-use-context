@@ -46,7 +46,7 @@ current() {
 }
 
 latest() {
-	if ! [ -f $latest_file ]; then
+	if ! [ -f $latest_file ] || [ "$(cat $latest_file)" = "none" ]; then
 		echo "No config is being used at the moment..."
 	else
 		local latest=$(cat $latest_file)
@@ -55,13 +55,13 @@ latest() {
 }
 
 none() {
-	if ! [ -f $latest_file ] || [ -z ${KUBECONFIG+true} ]; then
+	if [ -z ${KUBECONFIG+true} ]; then
 		echo "No config file is being used at the moment..."
 	else
 		unset KUBECONFIG
 		sed -i '/^#kubectl context config file/d' $HOME/.${current_shell}rc
 		sed -i '/^.*KUBECONFIG.*/d' $HOME/.${current_shell}rc
-		rm $latest_file
+		echo "none" > $latest_file
   fi
 }
 
