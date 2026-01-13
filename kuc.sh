@@ -80,21 +80,23 @@ help() {
 
 update_kubeconfig() {
 	local context_to_use="$1"
-	echo "Using config file $config_dir/$context_to_use.yaml"
+	local latest_config=$(ls ${config_dir} | grep "${context_to_use}")
+	echo "Using config file $config_dir/$latest_config"
 
-	export KUBECONFIG="${config_dir}/${context_to_use}.yaml"
+	export KUBECONFIG="${config_dir}/${latest_config}"
 
 	sed -i '/^#kubectl context config file/d' $HOME/.${current_shell}rc
 	sed -i '/^.*KUBECONFIG.*/d' $HOME/.${current_shell}rc
 
 	echo "#kubectl context config file
-export KUBECONFIG=${config_dir}/${context_to_use}.yaml" >> $HOME/.${current_shell}rc
-
-	echo "$config_dir/$context_to_use.yaml" > $latest_file
+export KUBECONFIG=${config_dir}/${latest_config}" >> $HOME/.${current_shell}rc
+	
+	local latest_config=$(ls $config_dir | grep $context_to_use)
+	echo "$config_dir/$latest_config" > $latest_file
 }
 
 select_config() {
-	local -a contexts=($(ls -tr $config_dir | sed 's/.yaml//'))
+	local -a contexts=($(ls -tr $config_dir | sed 's/.yaml//' | sed s'/.yml//'))
 	if ! [ "$#" -eq 0 ] && [[ "$1" =~ ^([0-9]{1,3})$ ]] && [[ "$1" -gt 0 ]] && [[ "$1" -le ${#contexts[@]} ]]; then
 		local option="$1"
 	else
