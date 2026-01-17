@@ -80,7 +80,7 @@ help() {
 
 update_kubeconfig() {
 	local context_to_use="$1"
-	local latest_config=$(ls ${config_dir} | grep "${context_to_use}")
+	local latest_config=$(ls ${config_dir} | grep -e "^.*${context_to_use}.[yaml|yml].*$")
 	echo "Using config file $config_dir/$latest_config"
 
 	export KUBECONFIG="${config_dir}/${latest_config}"
